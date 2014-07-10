@@ -6,40 +6,42 @@ namespace :db do
   task(:load => [ "db:schema:load", "db:data:load" ])
 
   namespace :data do
-    def db_dump_data_file (extension = "yml")
-      "#{dump_dir}/data.#{extension}"
+    def db_dump_data_file(path_to_file = 'tmp')
+      "#{Rails.root}/#{path_to_file}"
     end
 
-    def dump_dir(dir = "")
-      "#{Rails.root}/db#{dir}"
-    end
+    # def dump_dir(dir = "")
+    #   "#{Rails.root}/#{dir}"
+    # end
 
     desc "Dump contents of database to db/data.extension (defaults to yaml)"
     task :dump => :environment do
       format_class = ENV['class'] || "YamlDb::Helper"
+      path = ENV['dir'] || "tmp/#{Time.now.strftime('%Y%m%d%H%M%S')}.yml"
+      puts db_dump_data_file(path)
       helper = format_class.constantize
-      SerializationHelper::Base.new(helper).dump db_dump_data_file helper.extension
+      SerializationHelper::Base.new(helper).dump(db_dump_data_file(path))
     end
 
-    desc "Dump contents of database to curr_dir_name/tablename.extension (defaults to yaml)"
-    task :dump_dir => :environment do
-      format_class = ENV['class'] || "YamlDb::Helper"
-      dir = ENV['dir'] || "#{Time.now.to_s.gsub(/ /, '_')}"
-      SerializationHelper::Base.new(format_class.constantize).dump_to_dir dump_dir("/#{dir}")
-    end
+    # desc "Dump contents of database to curr_dir_name/tablename.extension (defaults to yaml)"
+    # task :dump_dir => :environment do
+    #   format_class = ENV['class'] || "YamlDb::Helper"
+    #   SerializationHelper::Base.new(format_class.constantize).dump_to_dir dump_dir("/tmp/#{dir}")
+    # end
 
     desc "Load contents of db/data.extension (defaults to yaml) into database"
     task :load => :environment do
       format_class = ENV['class'] || "YamlDb::Helper"
       helper = format_class.constantize
-      SerializationHelper::Base.new(helper).load(db_dump_data_file helper.extension)
+      path = ENV['dir'] || ''
+      SerializationHelper::Base.new(helper).load(db_dump_data_file(path))
     end
 
-    desc "Load contents of db/data_dir into database"
-    task :load_dir  => :environment do
-      dir = ENV['dir'] || "base"
-      format_class = ENV['class'] || "YamlDb::Helper"
-      SerializationHelper::Base.new(format_class.constantize).load_from_dir dump_dir("/#{dir}")
-    end
+    # desc "Load contents of db/data_dir into database"
+    # task :load_dir  => :environment do
+    #   dir = ENV['dir'] || "base"
+    #   format_class = ENV['class'] || "YamlDb::Helper"
+    #   SerializationHelper::Base.new(format_class.constantize).load_from_dir dump_dir("/tmp/#{dir}")
+    # end
   end
 end
