@@ -162,9 +162,9 @@ module SerializationHelper
     end
 
     def self.dump_table(io, table)
-      return if table_record_count(table).zero?
-
+      # Ensure every table has at least column list in ouput file
       dump_table_columns(io, table)
+      return if table_record_count(table).zero?
       dump_table_records(io, table)
     end
 
