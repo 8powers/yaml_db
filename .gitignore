@@ -6,3 +6,7 @@
 .idea/workspace.xml
 
 .idea/yaml_db.iml
+*.gem
+/.bundle/
+/pkg/
+Gemfile.lock
